@@ -9,9 +9,9 @@ describe 'rl_str_gen_spec' do
     end
   end
 
-  it 'should not contain latin letters, digits or underlines' do 
+  it 'should  contain only valid symbols' do 
     1000.times do 
-      expect(rl_str_gen.match? /\w/).to be false
+      expect(rl_str_gen.match? /[^A-ЯЁ,\.:\-!\?\'\"; ]/i).to be false
     end
   end
 
@@ -41,7 +41,7 @@ describe 'rl_str_gen_spec' do
     1000.times do 
       within = rl_str_gen.split.reject{ |el| el == '-' }[0..-2]
 
-      expect(within.select { |el| el[-1].match? /[^,:\"\'а-яё]/ }.size).to eq(0)
+      expect(within.select { |el| el[-1].match? /[^,:\"\'а-яё]/i }.size).to eq(0)
     end
   end
 
@@ -52,8 +52,13 @@ describe 'rl_str_gen_spec' do
     end
   end
 
-  it 'should not allow unwanted symbols inside words'
+  it 'should not allow unwanted symbols inside words' do 
+    1000.times do
+      expect(rl_str_gen.match? /[А-ЯЁ-][^А-ЯЁ -]+[А-ЯЁ-]/i).to be false
+    end
+  end
 
   it 'should not allow multiple punctuation marks'
 
+  it 'should not allow multiple dashes'
 end
