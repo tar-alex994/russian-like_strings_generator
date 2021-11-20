@@ -95,16 +95,68 @@ describe 'rl_str_gen_spec' do
 
 
   it 'should not allow words starting with ь, ъ, ы' do 
-
+    1000.times do 
+      expect(rl_str_gen.match /\b[ьъы]/i).to be_nil
+    end
   end
 
 
   it 'should not contain capital letters insider words if not an acronym' do 
+    1000.times do 
+      words = rl_str_gen.gsub(/[^А-ЯЁ ]/i, '').split
 
+      words.each do |el|
+        unless el.match? /\A[А-ЯЁ]{2,}\z/
+          expect(el.match /\A.+[А-ЯЁ]/).to be_nil
+        end
+      end
+    end
+  end
+
+
+  it 'should allow acronyms only to 5 letters long' do 
+    1000.times do 
+      acr = rl_str_gen.gsub(/[^А-ЯЁ ]/i, '').scan(/[А-ЯЁ]{2,}/)
+
+      expect(acr.count{ |a| a.size > 5}).to eq(0)
+    end
+  end
+
+
+  it 'should not allow one-letter words whith a capital letter' do 
+    1000.times do
+      expect(rl_str_gen.match /\ \"?[А-ЯЁ]\b/).to be_nil
+    end
   end
 
 
   it 'should allways have a vowel after й at the begining of the word' do
+    1000.times do 
+      expect(rl_str_gen.match /\bй[^ео]/i).to be_nil
+    end
+  end
+
+
+  it 'should allow only particular letters after й insider words' do 
+    1000.times do 
+      expect(rl_str_gen.match /Bй[ьъыёуиаэюжй]/i).to be_nil
+    end
+  end
+
+  it 'should allways be a vowel in 2- and 3- letter words' do 
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, '')
+      .split
+      .select { |el| el.size == 2 || el.size == 3 }
+      .reject { |el| el.match?(/\A[А-ЯЁ]+\z/) }
+      .each do |word|
+        expect(word).to match(/[аоуеыиэюяё]/)
+      end
+    end
+  end
+
+  it 'should allow only particular one letter words' do 
 
   end
 
@@ -126,6 +178,11 @@ describe 'rl_str_gen_spec' do
 
   it 'should contain vowels if more than 1 letter and not and acronym' do 
 
+  end
+
+
+  it 'should start with a capital letter' do 
+  # помнить насчет кавычек
   end
 
 end
