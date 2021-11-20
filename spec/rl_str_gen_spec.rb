@@ -103,11 +103,12 @@ describe 'rl_str_gen_spec' do
 
   it 'should not contain capital letters insider words if not an acronym' do 
     1000.times do 
-      words = rl_str_gen.gsub(/[^А-ЯЁ ]/i, '').split
-
-      words.each do |el|
-        unless el.match? /\A[А-ЯЁ]{2,}\z/
-          expect(el.match /\A.+[А-ЯЁ]/).to be_nil
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, '')
+      .split
+      .each do |word|
+        unless word.match? /\A[А-ЯЁ]{2,}\z/
+          expect(word.match /\A.+[А-ЯЁ]/).to be_nil
         end
       end
     end
@@ -157,32 +158,83 @@ describe 'rl_str_gen_spec' do
   end
 
   it 'should allow only particular one letter words' do 
-
+    1000.times do 
+      rl_str_gen.scan(/\b[А-ЯЁ]\b/i).each do |word|
+        expect(word).to match(/[ЯВОУИКСАЖ]/i)
+      end
+    end
   end
 
 
   it 'should not allow more than 4 consonant letters in a row' do 
-
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, '')
+      .split
+      .each do |word|
+        unless word.match? /\A[А-ЯЁ]{2,}\z/
+          expect(word.match /[^аоуеыиэюяё]{5,}/i).to be_nil
+        end
+      end
+    end
   end
 
 
   it 'should not allow more than 2 vowel letters in a raw' do 
-
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, '')
+      .split
+      .each do |word|
+        unless word.match? /\A[А-ЯЁ]{2,}\z/
+          expect(word.match /[аоуеыиэюяё]{3,}/i).to be_nil
+        end
+      end
+    end
   end
 
 
   it 'should not allow more than 2 same consonant letters in a raw' do 
-
-  end
-
-
-  it 'should contain vowels if more than 1 letter and not and acronym' do 
-
+   1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, '')
+      .split
+      .each do |word|
+        unless word.match? /\A[А-ЯЁ]{2,}\z/
+          expect(word.match /([^аоуеыиэюяё])\1\1/i).to be_nil
+        end
+      end
+    end
   end
 
 
   it 'should start with a capital letter' do 
-  # помнить насчет кавычек
+    1000.times do 
+      expect(rl_str_gen).to match(/\A\"?[А-ЯЁ]/)
+    end
+  end
+
+
+  it 'should contain atleast 40% vowels in multi-syllable word' do 
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ ]/i, ' ')
+      .split
+      .select { |w| w.match? /[аоуеыиэюяё].*[аоуеыиэюяё]/i }
+      .each do |el|
+        unless el.match? /\A[А-ЯЁ]{2,}\z/
+          found = el.scan(/[аоуеыиэюяё]/i).size 
+          calc  = (el.size * 0.4).to_i
+          res   = found >= calc ? ">= #{calc} vowels" : "#{found} vowels"
+
+          expect([res, el]).to eq([">= #{calc} vowels", el]) 
+        end
+      end
+    end
+  end
+
+
+  it 'should  vowels in a single-syllable word' do 
   end
 
 end
