@@ -144,6 +144,7 @@ describe 'rl_str_gen_spec' do
     end
   end
 
+
   it 'should allways be a vowel in 2- and 3- letter words' do 
     1000.times do 
       rl_str_gen
@@ -156,6 +157,7 @@ describe 'rl_str_gen_spec' do
       end
     end
   end
+
 
   it 'should allow only particular one letter words' do 
     1000.times do 
@@ -224,7 +226,7 @@ describe 'rl_str_gen_spec' do
       .each do |el|
         unless el.match? /\A[А-ЯЁ]{2,}\z/
           found = el.scan(/[аоуеыиэюяё]/i).size 
-          calc  = (el.size * 0.4).to_i
+          calc  = ((el.size - el.scan(/[ьъ]/i).size) * 0.4).to_i
           res   = found >= calc ? ">= #{calc} vowels" : "#{found} vowels"
 
           expect([res, el]).to eq([">= #{calc} vowels", el]) 
@@ -234,7 +236,47 @@ describe 'rl_str_gen_spec' do
   end
 
 
-  it 'should  vowels in a single-syllable word' do 
+  it 'should contain 5 or less consonants in a single-syllable word' do 
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ -]/i, '')
+      .split
+      .reject { |w| w.match?(/-|([аоуеыиэюяё].*[аоуеыиэюяё])/i) ||
+                    w.match?(/\A[А-ЯЁ]{2,}\z/)}
+      .each do |word|
+        expect(word.size).to be <= 6
+      end
+    end
+  end
+
+
+  it "should not allow a vowel at the begining of the word"\
+     "in a single-syllable word if they have 3 or more letters" do 
+    1000.times do 
+      rl_str_gen
+      .gsub(/[^А-ЯЁ -]/i, '')
+      .split
+      .reject { |w| w.match?(/-|([аоуеыиэюяё].*[аоуеыиэюяё])/i) ||
+                    w.match?(/\A[А-ЯЁ]{2,}\z/) || 
+                    w.size < 3 }
+      .each do |word|
+        expect(word).to match(/\A[^аоуеыиэюяё]/i)
+      end
+    end
+  end
+
+
+  it 'should allow only я, е, ё, ю after ъ' do 
+    1000.times do 
+      expect(rl_str_gen.gsub(/\b[А-ЯЁ]{2,}\b/,'').match(/ъ[^яеёю]/i)).to be_nil
+    end
+  end
+
+
+  it 'should forbit Ь and Ъ in acronyms' do
+    1000.times do 
+      expect(rl_str_gen.match(/(?=\b[А-ЯЁ]{2,}\b)\b[А-ЯЁ]*[ЪЬ][А-ЯЁ]*\b/)).to be_nil
+    end
   end
 
 end
