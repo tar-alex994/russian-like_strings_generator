@@ -18,7 +18,7 @@ describe 'rl_str_gen_spec' do
 
 
   it 'should not be ower 300 symbols' do 
-    100_000.times do 
+    10_000.times do 
       expect(rl_str_gen.size).to be <= 300
     end
   end
@@ -140,7 +140,7 @@ describe 'rl_str_gen_spec' do
 
   it 'should allow only particular letters after й insider words' do 
     1000.times do 
-      expect(rl_str_gen.match /Bй[ьъыёуиаэюжй]/i).to be_nil
+      expect(rl_str_gen.match /\Bй[ьъыёуиаэюжй]/i).to be_nil
     end
   end
 
@@ -162,7 +162,7 @@ describe 'rl_str_gen_spec' do
   it 'should allow only particular one letter words' do 
     1000.times do 
       rl_str_gen.scan(/\b[А-ЯЁ]\b/i).each do |word|
-        expect(word).to match(/[ЯВОУИКСАЖ]/i)
+        expect(word).to match(/[ЯВОУИКСА]/i)
       end
     end
   end
