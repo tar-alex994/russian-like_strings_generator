@@ -1,7 +1,13 @@
 require 'rspec'
 require_relative '../app/methods'
 
-describe 'rl_str_gen_spec' do
+describe 'nested methods' do 
+  it '' do
+  end
+end
+
+
+describe 'Resulting sentence' do
 
   it 'should return a string' do 
     1000.times do 
@@ -153,7 +159,7 @@ describe 'rl_str_gen_spec' do
       .select { |el| el.size == 2 || el.size == 3 }
       .reject { |el| el.match?(/\A[А-ЯЁ]+\z/) }
       .each do |word|
-        expect(word).to match(/[аоуеыиэюяё]/)
+        expect(word).to match(/[аоуеыиэюяё]/i)
       end
     end
   end
