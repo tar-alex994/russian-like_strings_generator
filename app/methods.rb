@@ -113,10 +113,10 @@ def plan_words
   #        }
 
   arr.each do |el|
-    case rand(10)
-    when 0 
+    case rand(20)
+    when 0
       el[:case] = :acronym
-    when 1
+    when 1, 2
       el[:case] = :capital
     else
       el[:case] = :down_case
@@ -172,7 +172,6 @@ def make_common_word(hash)
   #'should allow only particular one letter words'
   #'should not allow more than 4 consonant letters in a row'
   #'should not allow more than 2 vowel letters in a raw' 
-  #'should not allow more than 2 same consonant letters in a raw'
   #'should contain atleast 40% vowels in multi-syllable word'
   #'should contain 5 or less consonants in a single-syllable word'
   #"should not allow a vowel at the begining of the word"\
@@ -199,7 +198,42 @@ end
 
 
 def add_dash(arr)
+  return arr if arr.size < 5 || arr.size > 14
+
+  vowel_indexes = []
+
+  arr.each_with_index do |el, i|
+    vowel_indexes << i if VOWELS.any?(el)
+  end
+
+  dash_zone_borders = 
+
+  [
+
+    vowel_indexes[0] == 0 ? 2 : vowel_indexes[0] + 1,
+    vowel_indexes[-1] == arr.size-1 ? vowel_indexes[-1] - 1 : vowel_indexes[-1]
+  
+  ]
+
+  dash_zone_borders[0]..dash_zone_borders[1].map { |i|
+    next if arr[i] == 1100
+
+  }
+
   arr
+end
+
+
+def get_no_insert_range(arr)
+  no_insert  = []
+  consonants = 0
+
+  arr.each_with_index { |el, i| 
+    VOWELS.any?(el) ? consonants = 0 : consonants += 1
+    no_insert.push((i-3)..(i+1)) if consonants == 4
+  }
+
+  no_insert
 end
 
 
@@ -219,9 +253,13 @@ def generate_single_syllable_word
 
   word.map! { |el| el ? el : CONSONANTS_PROBABILITY_ARRAY.sample }
 
-  word = manage_i_short(word)
+  finalize_word(word)
+end
 
-  occasionally_add_softining_sing(word)
+
+#'should not allow more than 2 same consonant letters in a raw'
+def check_same_consonants(arr)
+  arr
 end
 
 
@@ -232,6 +270,14 @@ end
 
 def occasionally_add_softining_sing(arr)
   arr
+end
+
+
+def finalize_word(word)
+  word = check_same_consonants(word)
+  word = manage_i_short(word)
+
+  occasionally_add_softining_sing(word)
 end
 
 
