@@ -85,7 +85,9 @@ CONSONANTS_PROBABILITY_ARRAY = provide_distribution(select_letters(CONSONANTS))
 
 
 def rl_str_gen    #russian-like string generator
-  words_gen(plan_words).map {|a| a << 32 }.flatten[0..-2].pack("U*")
+  words = words_gen(plan_words)
+  digital_capitalize(words[0])
+  words.map {|a| a << 32 }.flatten[0..-2].push(46).pack("U*")
 end
 
 
@@ -215,7 +217,7 @@ def add_dash(arr)
   
   ]
 
-  dash_zone_borders[0]..dash_zone_borders[1].map { |i|
+  (dash_zone_borders[0]..dash_zone_borders[1]).map { |i|
     next if arr[i] == 1100
 
   }
